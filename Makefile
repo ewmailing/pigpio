@@ -8,6 +8,8 @@ STRIPLIB = strip --strip-unneeded
 
 CFLAGS	+= -O3 -Wall
 
+LDFLAGS	+= -Wl,-rpath,'$$ORIGIN:$$ORIGIN/lib:$$ORIGIN/../lib'
+
 LIB1     = libpigpio.so
 OBJ1     = pigpio.o command.o
 
@@ -34,19 +36,19 @@ command.o: command.c pigpio.h command.h
 	$(CC) $(CFLAGS) -fpic -c -o command.o command.c
 
 x_pigpio:	x_pigpio.o $(LIB1)
-	$(CC) -o x_pigpio x_pigpio.o $(LL1)
+	$(CC) -o x_pigpio ${LDFLAGS} x_pigpio.o $(LL1)
 
 x_pigpiod_if:	x_pigpiod_if.o $(LIB2)
-	$(CC) -o x_pigpiod_if x_pigpiod_if.o $(LL2)
+	$(CC) -o x_pigpiod_if ${LDFLAGS} x_pigpiod_if.o $(LL2)
 
 pigpiod:	pigpiod.o $(LIB1)
-	$(CC) -o pigpiod pigpiod.o $(LL1)
+	$(CC) -o pigpiod ${LDFLAGS} pigpiod.o $(LL1)
 
 pigs:		pigs.o command.o
-	$(CC) -o pigs pigs.o command.o
+	$(CC) -o pigs ${LDFLAGS}  pigs.o command.o
 
 pig2vcd:	pig2vcd.o
-	$(CC) -o pig2vcd pig2vcd.o
+	$(CC) -o pig2vcd ${LDFLAGS} pig2vcd.o
 
 clean:
 	rm -f *.o *.i *.s *~ $(ALL)
@@ -90,12 +92,12 @@ uninstall:
 	sudo ldconfig
 
 $(LIB1):	$(OBJ1)
-	$(SHLIB) -o $(LIB1) $(OBJ1)
+	$(SHLIB) -o $(LIB1) ${LDFLAGS} $(OBJ1)
 	$(STRIPLIB) $(LIB1)
 	$(SIZE)     $(LIB1)
 
 $(LIB2):	$(OBJ2)
-	$(SHLIB) -o $(LIB2) $(OBJ2)
+	$(SHLIB) -o $(LIB2) ${LDFLAGS} $(OBJ2)
 	$(STRIPLIB) $(LIB2)
 	$(SIZE)     $(LIB2)
 
